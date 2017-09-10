@@ -50,10 +50,10 @@ GeneticAlgorithm.prototype = {
 	},
 
 	activateBrain : function(bird, target) {
-		// Input 1 : Horizontal Distance Between Bird & target
-		var targetDeltaX = this.normalize(target.x, 700) this.SCALE_FACTOR;
+		// Input 1 : Horizontal Distance Between Bird, target
+		var targetDeltaX = this.normalize(target.x, 700) * this.SCALE_FACTOR;
 
-		// Input 2 :Vertical Difference between Bird& target
+		// Input 2 :Vertical Difference between Bird, target
 		var targetDeltaY = this.normalize(bird.y - target.y, 800) * this.SCALE_FACTOR;
 
 		// Create Array of inputs;
@@ -84,7 +84,7 @@ GeneticAlgorithm.prototype = {
 		for(var i = this.top_units; i<this.max_units; i++){
 			var parA, parB, offspring;
 
-			if(i == top_units){
+			if(i == this.top_units){
 				parA = Winners[0].toJSON();
 				parB = Winners[1].toJSON();
 				offspring = this.crossOver(parA, parB);
@@ -112,7 +112,7 @@ GeneticAlgorithm.prototype = {
 		}
 
 		// if top winner has the best fitness in the history, store
-		if(Winners[0].fitness > best_fitness){
+		if(Winners[0].fitness > this.best_fitness){
 			this.best_population = this.iteration;
 			this.best_fitness = Winners[0].fitness;
 			this.best_score = Winners[0].score;
@@ -186,6 +186,6 @@ GeneticAlgorithm.prototype = {
 		else if(value > max)
 			value = max;
 		
-		return value/max;
+		return (value/max);
 	}
 }

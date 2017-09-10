@@ -1,15 +1,15 @@
 /* Create New Phaser Game for Flappy Bird on Window load */
 
-window.onload = function(){
-	var game = new Phaser.Game(1280, 720, Phaser.Canvas, 'game');
-
+window.onload = function () {
+	var game = new Phaser.Game(1280, 720, Phaser.CANVAS, 'game');
+	
 	game.state.add('Main', App.Main);
 	game.state.start('Main');
-}
+};
 
-/* ==============================
-	Main Program 
-   ============================== */
+/***********************************************************************************
+/* Main program
+/***********************************************************************************/
 
 var App = {};
 
@@ -18,7 +18,7 @@ App.Main = function(game){
 	this.STATE_START = 2;
 	this.STATE_PLAY = 3;
 	this.STATE_GAMEOVER = 4;
-
+	
 	this.BARRIER_DISTANCE = 300;
 }
 
@@ -27,37 +27,37 @@ App.Main.prototype = {
 		this.game.load.spritesheet('imgBird', 'contents/img_bird.png', 36, 36, 20);
 		this.game.load.spritesheet('imgTree', 'contents/img_tree.png', 90, 400, 2);
 		this.game.load.spritesheet('imgButtons', 'contents/img_buttons.png', 110, 40, 3);
-
+		
 		this.game.load.image('imgTarget', 'contents/img_target.png');
 		this.game.load.image('imgGround', 'contents/img_ground.png');
 		this.game.load.image('imgPause', 'contents/img_pause.png');
 		this.game.load.image('imgLogo', 'contents/img_logo.png');
-
-		this.game.load.bitmapFont('fnt_chars_black', 'contents/fnt_chars_black.png', 'contents/fnt_chars_black.fnt');
-		this.game.load.bitmapFont('fnt_digits_blue', 'contents/fnt_digits_blue.png', 'contents/fnt_digits_blue.fnt');
-		this.game.load.bitmapFont('fnt_digits_red', 'contents/fnt_digits_red.png', 'contents/fnt_digits_red.fnt');
-		this.game.load.bitmapFont('fnt_digits_green', 'contents/fnt_digits_green.png', 'contents/fnt_digits_green.fnt');
+		
+		this.load.bitmapFont('fnt_chars_black', 'contents/fnt_chars_black.png', 'contents/fnt_chars_black.fnt');
+		this.load.bitmapFont('fnt_digits_blue', 'contents/fnt_digits_blue.png', 'contents/fnt_digits_blue.fnt');
+		this.load.bitmapFont('fnt_digits_green', 'contents/fnt_digits_green.png', 'contents/fnt_digits_green.fnt');
+		this.load.bitmapFont('fnt_digits_red', 'contents/fnt_digits_red.png', 'contents/fnt_digits_red.fnt');
 	},
-
+	
 	create : function(){
-		//set scale mode for entire screen
+		// set scale mode to cover the entire screen
 		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.scale.pageAlignVertically = true;
 		this.scale.pageAlignHorizontally = true;
 
-		//set background color
-		this.game.stage.background = "#89bfdc";
-
-		//keep game running in case it loses focus
+		// set a blue color for the background of the stage
+		this.game.stage.backgroundColor = "#89bfdc";
+		
+		// keep game running if it loses the focus
 		this.game.stage.disableVisibilityChange = true;
+		
+		// start the Phaser arcade physics engine
+		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-		//start Phaser's physics engine
-		this.game.physics.startSystem(Phaser.Physics.Arcade);
-
-		//set gravity
+		// set the gravity of the world
 		this.game.physics.arcade.gravity.y = 1300;
-
-		//create new Genetic Algorithm
+		
+		// create a new Genetic Algorithm with a population of 10 units which will be evolving by using 4 top units
 		this.GA = new GeneticAlgorithm(10, 4);
 
 		//create BirdGroup
