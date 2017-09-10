@@ -85,14 +85,14 @@ App.Main.prototype = {
 		this.bmdStatus.addToWorld(this.game.width - this.bmdStatus.width, 0);
 
 		//Create text Object to Display
-		new text(this.game, 1047, 10, "In1 In2 Out", "right", "fnt_chars_black");
+		new Text(this.game, 1047, 10, "In1 In2 Out", "right", "fnt_chars_black");
 		this.txtPopulationPrev = new Text(this.game, 1190, 10, "", "right", "fnt_chars_black");
-		this.txtPopulationCur = new Text(this.game, 1270, 10, "", "right", "fnt_chars_black");
+		this.txtPopulationCurr = new Text(this.game, 1270, 10, "", "right", "fnt_chars_black");
 
 		//Create Objects of Birds & Show their status in Heads-Up display
 		this.txtStatusPrevGreen = [];	//details of top units of previous population
 		this.txtStatusPrevRed = [];		//details of weak units of previous population
-		this.txtStatusCur = [];			//details of units of current population
+		this.txtStatusCurr = [];			//details of units of current population
 
 		for(var i = 0; i<this.GA.max_units; i++){
 			var y = 46 + i * 50;
@@ -100,7 +100,7 @@ App.Main.prototype = {
 			new Text(this.game, 1110, y, "Fitness:\nScore:", "right", "fnt_chars_black");
 			this.txtStatusPrevGreen.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_green"));
 			this.txtStatusPrevRed.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_red"));
-			this.txtStatusCur.push(new Text(this.game, 1270, y, "", "right", "fnt_digits_blue"));
+			this.txtStatusCurr.push(new Text(this.game, 1270, y, "", "right", "fnt_digits_blue"));
 		}
 
 		//create new Text object for Best Bird int the population
@@ -113,7 +113,7 @@ App.Main.prototype = {
 		this.btnLogo = this.game.add.button(910, 680, 'imgLogo', this.onMoreGamesClick, this);
 
 		//create Game Pause Info
-		this.sprPause = this.game.add.sprite(455, 360, 'imgpause');
+		this.sprPause = this.game.add.sprite(455, 360, 'imgPause');
 		this.sprPause.anchor.setTo(0.5);
 		this.sprPause.kill();
 
@@ -126,7 +126,6 @@ App.Main.prototype = {
 
 	update : function() {
 		switch(this.state){
-
 			case this.STATE_INIT:
 				this.GA.reset();
 				this.GA.createPopulation();
@@ -137,10 +136,10 @@ App.Main.prototype = {
 			case this.STATE_START: 
 				// Start or Restart Game
 				this.txtPopulationPrev.text = "GEN" + (this.GA.iteration - 1);
-				this.txtPopulationCur.text = "GEN" + (this.GA.iteration);
+				this.txtPopulationCurr.text = "GEN" + (this.GA.iteration);
 
 				this.txtBestUnit.text = "The Best Unit was Born in Genration " + (this.GA.best_population) + ":" +
-										"\nFitness = " + this.GA.best_fitness.to_fixed(2) + " / Score = " + this.GA.best_score;
+										"\nFitness = " + this.GA.best_fitness.toFixed(2) + " / Score = " + this.GA.best_score;
 
 				//Reset Score & Distance
 				this.score = 0;
@@ -164,15 +163,16 @@ App.Main.prototype = {
 					bird.restart(this.GA.iteration);
 
 					if(this.GA.Population[bird.index].isWinner){
-						this.txtStatusPrevGreen[bird.index].text = bird.fitness_prev.to_fixed(2) + "\n" + bird.score_prev;
+						this.txtStatusPrevGreen[bird.index].text = bird.fitness_prev.toFixed(2) + "\n" + bird.score_prev;
 						this.txtStatusPrevRed[bird.index].text = "";
 					}
 					else{
 						this.txtStatusPrevGreen[bird.index].text = "";
-						this.txtStatusPrevRed[bird.index].text = bird.fitness_prev.to_fixed(2) + "\n" + bird.score_prev;
+						this.txtStatusPrevRed[bird.index].text = bird.fitness_prev.toFixed(2) + "\n" + bird.score_prev;
 					}
 
 				}, this);
+
 				this.state = this.STATE_PLAY;
 				break;
 
@@ -185,11 +185,11 @@ App.Main.prototype = {
 
 				this.BirdGroup.forEachAlive(function(bird) {
 					//Calculate Current Fitness & Score of A bird
-					bird.fitness_cur = this.distance - this.game.physics.arcade.distanceBetween(bird, this.TargetPoint);
-					bird.score_cur = this.score;
+					bird.fitness_curr = this.distance - this.game.physics.arcade.distanceBetween(bird, this.TargetPoint);
+					bird.score_curr = this.score;
 
 					// Check collision between Bird & targetBarrier
-					this.game.physics.arcade.collision(bird, this.targetBarrier, this.onDeath, null, this);
+					this.game.physics.arcade.collide(bird, this.targetBarrier, this.onDeath, null, this);
 
 					if(bird.alive){
 						// Check if A bird Can Pass through Gap
@@ -237,7 +237,7 @@ App.Main.prototype = {
 	},
 
 	drawStatus : function() {
-		this.bmdStatus.fill(180, 10, 180);
+		this.bmdStatus.fill(180, 180, 180);
 		this.bmdStatus.rect(0, 0, this.bmdStatus.width, 35, "#8e8e8e");
 
 		this.BirdGroup.forEach(function(bird) {
@@ -261,7 +261,7 @@ App.Main.prototype = {
 			}
 
 			// draw bird's fitness & score
-			this.textStatusCur[bird.index].setText(bird.fitness_cur.toFixed(2) + "\n" + bird.score_cur);
+			this.txtStatusCurr[bird.index].setText(bird.fitness_curr.toFixed(2) + "\n" + bird.score_curr);
 
 		}, this);
 	},
@@ -271,8 +271,8 @@ App.Main.prototype = {
 	},
 
 	onDeath : function(bird) {
-		this.GA.Population[bird.index].fitness = bird.fitness_cur;
-		this.GA.Population[bird.index].score = bird.score_cur;
+		this.GA.Population[bird.index].fitness = bird.fitness_curr;
+		this.GA.Population[bird.index].score = bird.score_curr;
 
 		bird.death();
 		if(this.BirdGroup.countLiving() == 0) 
@@ -319,7 +319,7 @@ var TreeGroup = function(game, parent, index){
 	this.add(this.bottomTree);
 }
 
-TreeGroup.prototype = Object.create(Phaser.Sprite.prototype);
+TreeGroup.prototype = Object.create(Phaser.Group.prototype);
 TreeGroup.prototype.constructor = TreeGroup;
 
 TreeGroup.prototype.restart = function(x){
@@ -355,7 +355,7 @@ var Tree = function(game, frame) {
 
 	this.body.allowGravity = false;
 	this.body.immovable = true;
-}
+};
 
 Tree.prototype = Object.create(Phaser.Sprite.prototype);
 Tree.prototype.constructor = Tree;
@@ -377,30 +377,30 @@ var Bird = function(game, x, y, index) {
 
 	//enable physics on Bird
 	this.game.physics.arcade.enableBody(this);
-}
+};
 
 Bird.prototype = Object.create(Phaser.Sprite.prototype);
 Bird.prototype.constructor = Bird;
 
 Bird.prototype.restart = function(iteration){
-	this.fitness_prev = (iteration == 1) ? 0 :this.fitness_cur;
-	this.fitness_cur = 0;
+	this.fitness_prev = (iteration == 1) ? 0 :this.fitness_curr;
+	this.fitness_curr = 0;
 
-	this.score_prev = (iteration == 1) ? 0 : this.score_cur;
-	this.score_cur = 0;
+	this.score_prev = (iteration == 1) ? 0 : this.score_curr;
+	this.score_curr = 0;
 
 	this.alpha = 1;
 	this.reset(150, 300 + this.index * 20);
-}
+};
 
 Bird.prototype.flap = function(){
 	this.body.velocity.y = -400;
-}
+};
 
 Bird.prototype.death = function(){
 	this.alpha = 0.5;
 	this.kill();
-}
+};
 
 /* ==============================
 	Text Class
@@ -419,7 +419,7 @@ var Text = function(game, x, y, text, align, font){
 	}
 
 	this.game.add.existing(this);
-}
+};
 
 Text.prototype = Object.create(Phaser.BitmapText.prototype);
 Text.prototype.constructor = Text;
