@@ -81,6 +81,76 @@ GeneticAlgorithm.prototype = {
 		}
 
 		// fill next population
-		
+		for(var i = this.top_units; i<this.max_units; i++){
+			var parA, parB, offspring;
+
+			if(i == top_units){
+				parA = Winners[0].toJSON();
+				parB = Winners[1].toJSON();
+				offspring = this.crossOver(parA, parB);
+			}
+			else if(i < this.max_units - 2){
+				// offspring is made by crossover over to two random winner
+				parA = this.getRandomUnit(Winners).toJSON();
+				parB = this.getRandomUnit(Winners).toJSON();
+				offspring = this.crossOver(parA, parB);
+			}
+			else{
+				offspring = this.getRandomUnit(Winners).toJSON();
+			}
+
+			// mutate offsrping
+			offspring = this.mutation(offspring);
+
+			var newUnit = synaptic.Network.fromJSON(offspring);
+			newUnit.index = this.Population[i].index;
+			newUnit.fitness = 0;
+			newUnit.score = 0;
+			newUnit.isWinner = false;
+
+			this.Population[i] = newUnit;
+		}
+
+		// if top winner has the best fitness in the history, store
+		if(Winners[0].fitness > best_fitness){
+			this.best_population = this.iteration;
+			this.best_fitness = Winners[0].fitness;
+			this.best_score = Winners[0].score;
+		}
+
+		this.Population.sort(function(unitA, unitB) {
+			return unitA.index - unitB.index;
+		});
+	},
+
+	//Select Best Unit
+	selection : function() {
+		// Sort Population
+		var sortedPopulation = this.Population.sort(function(unitA, unitB) {
+			return unitB.fitness - unitA.fitness;
+		});
+
+		// Mark winners
+		for(var i = 0; i<this.top_units; i++)
+			this.Population[i].isWinner = true;
+
+		return sortedPopulation.slice(0, this.top_units);
+	},
+
+	crossOver : function(parA, parB) {
+		// get a cross over cutting point
+		var cutPoint = this.random(0, parA.neurons.length - 1);
+
+		for(var i = cutPoint; i<parA.neurons.length; i++){
+			var biasFromParA = parA.neurons[i]['bias'];
+			parA.neurons[i]['bias'] = parB.neurons[i]['bias'];
+			parB.neurons[i]['bias'] = biasFromParA;
+		}
+
+		return this.random(0, 1) == 1 ? parA : parB;
+	},
+
+	mutation : function() {
+
 	},
 }
