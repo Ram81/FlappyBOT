@@ -124,7 +124,149 @@ App.Main.prototype = {
 		this.state = this.STATE_INIT;
 	},
 
-	getNextBarrier : function(index) {
+	update : function() {
+		switch(this.state){
+
+			case this.STATE_INIT:
+				this.GA.reset();
+				this.GA.createPopulation();
+
+				this.state = this.STATE_START;
+				break;
+
+			case this.STATE_START: 
+				// Start or Restart Game
+				this.txtPopulationPrev.text = "GEN" + (this.GA.iteration - 1);
+				this.txtPopulationCur.text = "GEN" + (this.GA.iteration);
+
+				this.txtBestUnit.text = "The Best Unit was Born in Genration " + (this.GA.best_population) + ":" +
+										"\nFitness = " + this.GA.best_fitness.to_fixed(2) + " / Score = " + this.GA.best_score;
+
+				//Reset Score & Distance
+				this.score = 0;
+				this.distance = 0;
+
+				//Reset Barriers
+				this.BarrierGroup.forEach(function(barrier) {
+					barrier.restart(700 + barrier.index * this.BARRIER_DISTANCE);
+				}, this);
+
+				// Store First Barrier
+				this.firstBarrier = this.BarrierGroup.getAt(0);
+
+				// Store last Barrier
+				this.lastBarrier = this.BarrierGroup.getAt(this.BarrierGroup.length - 1);
+
+				// Store Current Barrier
+				this.targetBarrier = this.firstBarrier;
+
+				this.BirdGroup.forEach(function(bird) {
+					bird.restart(this.GA.iteration);
+
+					if(this.GA.population[bird.index].isWinner){
+						this.txtStatusPrevGreen[bird.index].text = bird.fitness_prev.to_fixed(2) + "\n" + bird.score_prev;
+						this.txtStatusPrevRed[bird.index].text = "";
+					}
+					else{
+						this.txtStatusPrevGreen[bird.index].text = "";
+						this.txtStatusPrevRed[bird.index].text = bird.fitness_prev.to_fixed(2) + "\n" + bird.score_prev;
+					}
+
+				}, this);
+				this.state = this.STATE_PLAY;
+				break;
+
+			case this.STATE_PLAY:
+				// Play the Game using GA Algorithm
+				this.TargetPoint.x = this.targetBarrier.getGapX();
+				this.TargetPoint.y = this.targetBarrier.getGapY();
+
+				var isNextTarget = false;
+
+				this.BirdGroup.forEachAlive(function(bird) {
+					//Calculate Current Fitness & Score of A bird
+					bird.fitness_cur = this.distance - this.game.physics.arcade.distanceBetween(bird, this.TargetPoint);
+					bird.score_cur = this.score;
+
+					// Check collision between Bird & targetBarrier
+					this.game.physics.arcade.collision(bird, this.targetBarrier, this.onDeath, null, this);
+
+					if(bird.alive){
+						// Check if A bird Can Pass through Gap
+						if(bird.x > this.TargetPoint.x)
+							isNextTarget = true;
+
+						// Check if bird goes out of bounds
+						if(bird.y < 0  || bird.y > 610)
+							this.onDeath(bird);
+
+						// Perform a Flap or Not Choose using GA
+						this.GA.activateBrain(bird, this.TargetPoint);
+					}
+
+				}, this);
+
+				// if atleast one bird passes through barrier choode next one
+				if(isNextTarget){
+					this.score++;
+					this.targetBarrier = this.getNextBarrier(this.targetBarrier.index);
+				}
+
+				// if first is gone out of left bound restart it from right
+				if(this.firstBarrier.getWorldX() < -this.firstBarrier.width){
+					this.firstBarrier.restart(this.lastBarrier.getWorldX() + this.BARRIER_DISTANCE);
+
+					this.firstBarrier = this.getNextBarrier(this.firstBarrier.index);
+					this.lastBarrier = this.getNextBarrier(this.lastBarrier.index);
+				}
+
+				// Increase the Distance travelled
+				this.distance += Math.abs(this.firstBarrier.topTree.deltaX);
+
+				this.drawStatus();
+				break;
+
+			case this.STATE_GAMEOVER:
+				// When All Birds Are dead evolve
+				this.GA.evolvePopulation();
+				this.GA.iteration++;
+
+				this.state = this.STATE_START;
+				break;
+		}
+	},
+
+	drawStatus : function() {
+		this.bmdStatus.fill(180, 10, 180);
+		this.bmdStatus.rect(0, 0, this.bmdStatus.width, 35, "#8e8e8e");
+
+		this.BirdGroup.forEach(function(bird) {
+			var y = 85 + bird.index * 50;
+
+			this.bmdStatus.draw(bird, 25, y-25);
+			this.bmdStatus.rect(0, y, this.bmdStatus.width, 2, "#888");
+
+			if(bird.alive){
+				var brain = this.GA.population[bird.index].toJSON();
+				var scale = this.GA.SCALE_FACTOR * 0.02;
+
+				// Input 1 & Input 2 for each bird
+				this.bmdStatus.rect(62, y, 9, -(50 - brain.neurons[0].activation/scale), "#000088");
+				this.bmdStatus.rect(90, y, 9, brain.neurons[1].activation/scale, "#000088");
+
+				if(brain.neurons[brain.neurons.length - 1].activation < 0.5)
+					this.bmdStatus.rect(118, y, 9, -20, "#880000");
+				else
+					this.bmdStatus.rect(118, y, 9, -40, "#008800");
+			}
+
+			// draw bird's fitness & score
+			this.textStatusCur[bird.index].setText(bird.fitness_cur.toFixed(2) + "\n" + bird.score_cur);
+
+		}, this);
+	},
+
+	getNextBarrier : function(index) { 
 		return this.BarrierGroup.getAt((index + 1) % this.BarrierGroup.length);
 	},
 
