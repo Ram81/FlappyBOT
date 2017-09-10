@@ -150,7 +150,42 @@ GeneticAlgorithm.prototype = {
 		return this.random(0, 1) == 1 ? parA : parB;
 	},
 
-	mutation : function() {
+	mutation : function(offspring) {
 
+		for(var i = 0; i<offspring.neurons.length; i++){
+			offspring.neurons[i]['bias'] = this.mutate(offspring.neurons[i]['bias'])
+		}
+
+		for(var i = 0; i<offspring.connections.length; i++){
+			offspring.connections[i]['weight'] = this.mutate(offspring.connections[i]['weight']);
+		}
+
+		return offspring;
 	},
+
+	mutate : function(gene) {
+		if(Math.random() < this.mutateRate){
+			var mutateFactor = 1 + ((Math.random() - 0.5) * 3 + (Math.random() - 0.5));
+			gene *= mutateFactor;
+		}
+
+		return gene;
+	},
+
+	random : function(min, max) {
+		return Math.floor(Math.random() * (max - min + 1) + min);
+	},
+
+	getRandomUnit : function(array) {
+		return array[this.random(0,array.length - 1)];
+	},
+
+	normalize : function(value, max) {
+		if(value < -max)
+			value = -max;
+		else if(value > max)
+			value = max;
+		
+		return value/max;
+	}
 }
