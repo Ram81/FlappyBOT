@@ -22,6 +22,25 @@ App.Main = function(game){
 	this.BARRIER_DISTANCE = 300;
 }
 
+App.Main.prototype = {
+	preload : function(){
+		this.game.load.spritesheet('imgBird', 'contents/img_bird.png', 36, 36, 20);
+		this.game.load.spritesheet('imgTree', 'contents/img_tree.png', 90, 400, 2);
+		this.game.load.spritesheet('imgButtons', 'contents/img_buttons.png', 110, 40, 3);
+
+		this.game.load.image('imgTarget', 'contents/img_target.png');
+		this.game.load.image('imgGround', 'contents/img_ground.png');
+		this.game.load.image('imgPause', 'contents.img_pause.png');
+		this.game.load.image('imgLogo', 'contents/img_logo.png');
+
+		this.game.load.bitmapFont('fnt_chars_black', 'contents/fnt_chars_black.png', 'contents/fnt_chars_black.fnt');
+		this.game.load.bitmapFont('fnt_digits_blue', 'contents/fnt_digits_blue.png', 'contents/fnt_digits_blue.fnt');
+		this.game.load.bitmapFont('fnt_digits_red', 'contents/fnt_digits_red.png', 'contents/fnt_digits_red.fnt');
+		this.game.load.bitmapFont('fnt_digits_green', 'contents/fnt_digits_green.png', 'contents/fnt_digits_green.fnt');
+	}
+
+}
+
 /* ==============================
 	TreeGroup Class
    ============================== */
@@ -68,7 +87,7 @@ TreeGroup.prototype.getGapY = function(){
 	Tree Class
    ============================== */
 
-var Tree = function(game, frame){
+var Tree = function(game, frame) {
 	Phaser.Sprite.call(this, game, 0, 0, 'imgTree', frame);
 
 	this.game.physics.arcade.enableBody(this);
@@ -84,16 +103,16 @@ Tree.prototype.constructor = Tree;
 	Bird Class
    ============================== */
 
-var Bird = function(game, x, y, index){
+var Bird = function(game, x, y, index) {
 	Phaser.Sprite.call(this, game, x, y, 'imgBird');
 
 	this.index = index;
 	this.anchor.setTo(0.5);
 
-	//adding flap animation
+	//adding flap animation & playing it
 	var i = index * 2;
 	this.animations.add('flap', [i, i+1]);
-	this.animations.add('flap', 8, true);
+	this.animations.play('flap', 8, true);
 
 	//enable physics on Bird
 	this.game.physics.arcade.enableBody(this);
@@ -110,7 +129,7 @@ Bird.prototype.restart = function(iteration){
 	this.score_cur = 0;
 
 	this.alpha = 1;
-	this.reset(150, 300 + this.index *20);
+	this.reset(150, 300 + this.index * 20);
 }
 
 Bird.prototype.flap = function(){
@@ -141,5 +160,5 @@ var Text = function(game, x, y, text, align, font){
 	this.game.add.existing(this);
 }
 
-Text.prototype = Object.create(Phaser.Sprite.prototype);
+Text.prototype = Object.create(Phaser.BitmapText.prototype);
 Text.prototype.constructor = Text;
