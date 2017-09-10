@@ -87,12 +87,12 @@ App.Main.prototype = {
 		//Create text Object to Display
 		new Text(this.game, 1047, 10, "In1 In2 Out", "right", "fnt_chars_black");
 		this.txtPopulationPrev = new Text(this.game, 1190, 10, "", "right", "fnt_chars_black");
-		this.txtPopulationCurr = new Text(this.game, 1270, 10, "", "right", "fnt_chars_black");
+		this.txtPopulationCur = new Text(this.game, 1270, 10, "", "right", "fnt_chars_black");
 
 		//Create Objects of Birds & Show their status in Heads-Up display
 		this.txtStatusPrevGreen = [];	//details of top units of previous population
 		this.txtStatusPrevRed = [];		//details of weak units of previous population
-		this.txtStatusCurr = [];			//details of units of current population
+		this.txtStatusCur = [];			//details of units of current population
 
 		for(var i = 0; i<this.GA.max_units; i++){
 			var y = 46 + i * 50;
@@ -100,7 +100,7 @@ App.Main.prototype = {
 			new Text(this.game, 1110, y, "Fitness:\nScore:", "right", "fnt_chars_black");
 			this.txtStatusPrevGreen.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_green"));
 			this.txtStatusPrevRed.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_red"));
-			this.txtStatusCurr.push(new Text(this.game, 1270, y, "", "right", "fnt_digits_blue"));
+			this.txtStatusCur.push(new Text(this.game, 1270, y, "", "right", "fnt_digits_blue"));
 		}
 
 		//create new Text object for Best Bird int the population
@@ -136,7 +136,7 @@ App.Main.prototype = {
 			case this.STATE_START: 
 				// Start or Restart Game
 				this.txtPopulationPrev.text = "GEN" + (this.GA.iteration - 1);
-				this.txtPopulationCurr.text = "GEN" + (this.GA.iteration);
+				this.txtPopulationCur.text = "GEN" + (this.GA.iteration);
 
 				this.txtBestUnit.text = "The Best Unit was Born in Genration " + (this.GA.best_population) + ":" +
 										"\nFitness = " + this.GA.best_fitness.toFixed(2) + " / Score = " + this.GA.best_score;
@@ -185,8 +185,8 @@ App.Main.prototype = {
 
 				this.BirdGroup.forEachAlive(function(bird) {
 					//Calculate Current Fitness & Score of A bird
-					bird.fitness_curr = this.distance - this.game.physics.arcade.distanceBetween(bird, this.TargetPoint);
-					bird.score_curr = this.score;
+					bird.fitness_cur = this.distance - this.game.physics.arcade.distanceBetween(bird, this.TargetPoint);
+					bird.score_cur = this.score;
 
 					// Check collision between Bird & targetBarrier
 					this.game.physics.arcade.collide(bird, this.targetBarrier, this.onDeath, null, this);
@@ -261,7 +261,7 @@ App.Main.prototype = {
 			}
 
 			// draw bird's fitness & score
-			this.txtStatusCurr[bird.index].setText(bird.fitness_curr.toFixed(2) + "\n" + bird.score_curr);
+			this.txtStatusCur[bird.index].setText(bird.fitness_cur.toFixed(2) + "\n" + bird.score_cur);
 
 		}, this);
 	},
@@ -271,8 +271,8 @@ App.Main.prototype = {
 	},
 
 	onDeath : function(bird) {
-		this.GA.Population[bird.index].fitness = bird.fitness_curr;
-		this.GA.Population[bird.index].score = bird.score_curr;
+		this.GA.Population[bird.index].fitness = bird.fitness_cur;
+		this.GA.Population[bird.index].score = bird.score_cur;
 
 		bird.death();
 		if(this.BirdGroup.countLiving() == 0) 
@@ -383,11 +383,11 @@ Bird.prototype = Object.create(Phaser.Sprite.prototype);
 Bird.prototype.constructor = Bird;
 
 Bird.prototype.restart = function(iteration){
-	this.fitness_prev = (iteration == 1) ? 0 :this.fitness_curr;
-	this.fitness_curr = 0;
+	this.fitness_prev = (iteration == 1) ? 0 :this.fitness_cur;
+	this.fitness_cur = 0;
 
-	this.score_prev = (iteration == 1) ? 0 : this.score_curr;
-	this.score_curr = 0;
+	this.score_prev = (iteration == 1) ? 0 : this.score_cur;
+	this.score_cur = 0;
 
 	this.alpha = 1;
 	this.reset(150, 300 + this.index * 20);
