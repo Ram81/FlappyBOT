@@ -70,6 +70,26 @@ var Bird = function(game, x, y, index){
 Bird.prototype = Object.create(Phaser.Sprite.prototype);
 Bird.prototype.constructor = Bird;
 
+Bird.prototype.restart = function(iteration){
+	this.fitness_prev = (iteration == 1) ? 0 :this.fitness_cur;
+	this.fitness_cur = 0;
+
+	this.score_prev = (iteration == 1) ? 0 : this.score_cur;
+	this.score_cur = 0;
+
+	this.alpha = 1;
+	this.reset(150, 300 + this.index *20);
+}
+
+Bird.prototype.flap = function(){
+	this.body.velocity.y = -400;
+}
+
+Bird.prototype.death = function(){
+	this.alpha = 0.5;
+	this.kill();
+}
+
 /* ==============================
 	Text Class
    ============================== */
