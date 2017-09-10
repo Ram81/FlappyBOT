@@ -30,7 +30,7 @@ App.Main.prototype = {
 
 		this.game.load.image('imgTarget', 'contents/img_target.png');
 		this.game.load.image('imgGround', 'contents/img_ground.png');
-		this.game.load.image('imgPause', 'contents.img_pause.png');
+		this.game.load.image('imgPause', 'contents/img_pause.png');
 		this.game.load.image('imgLogo', 'contents/img_logo.png');
 
 		this.game.load.bitmapFont('fnt_chars_black', 'contents/fnt_chars_black.png', 'contents/fnt_chars_black.fnt');
