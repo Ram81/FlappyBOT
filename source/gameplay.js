@@ -163,7 +163,7 @@ App.Main.prototype = {
 				this.BirdGroup.forEach(function(bird) {
 					bird.restart(this.GA.iteration);
 
-					if(this.GA.population[bird.index].isWinner){
+					if(this.GA.Population[bird.index].isWinner){
 						this.txtStatusPrevGreen[bird.index].text = bird.fitness_prev.to_fixed(2) + "\n" + bird.score_prev;
 						this.txtStatusPrevRed[bird.index].text = "";
 					}
@@ -247,7 +247,7 @@ App.Main.prototype = {
 			this.bmdStatus.rect(0, y, this.bmdStatus.width, 2, "#888");
 
 			if(bird.alive){
-				var brain = this.GA.population[bird.index].toJSON();
+				var brain = this.GA.Population[bird.index].toJSON();
 				var scale = this.GA.SCALE_FACTOR * 0.02;
 
 				// Input 1 & Input 2 for each bird
@@ -271,8 +271,8 @@ App.Main.prototype = {
 	},
 
 	onDeath : function(bird) {
-		this.GA.population[bird.index].fitness = bird.fitness_cur;
-		this.GA.population[bird.index].score = bird.score_cur;
+		this.GA.Population[bird.index].fitness = bird.fitness_cur;
+		this.GA.Population[bird.index].score = bird.score_cur;
 
 		bird.death();
 		if(this.BirdGroup.countLiving() == 0) 
