@@ -1,6 +1,6 @@
-/*      ===========================
+/*  ====================================
       Genetic Algorithm Implementation
-	=========================== */
+	==================================== */
 
 var GeneticAlgorithm = function(max_units, top_units) {
 	// Total Number of input units & top units
