@@ -67,7 +67,7 @@ Since the program is written in HTML5 using [Phaser framework](http://phaser.io/
 - **phaser.min.js**
 - **synaptic.min.js**
 
-## NOTE 
+### NOTE 
 
 The implementation is currently supported only on Firefox. The project is based on the repository [here](https://github.com/ssusnic/Machine-Learning-Flappy-Bird).
 
