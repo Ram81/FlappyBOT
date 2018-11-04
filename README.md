@@ -66,5 +66,8 @@ Since the program is written in HTML5 using [Phaser framework](http://phaser.io/
 
 - **phaser.min.js**
 - **synaptic.min.js**
-The implementation currently works only for firefox, feel free to add support for chrome browser. This project is based on the concept of evolutionary training of Neural Networks with the help of Genetic Algorithm.
+
+## NOTE 
+
+The implementation is currently supported only on Firefox. The project is based on the repository [here](https://github.com/ssusnic/Machine-Learning-Flappy-Bird).
 
